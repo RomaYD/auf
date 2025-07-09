@@ -1,0 +1,136 @@
+info:
+  contact: {}
+paths:
+  /disreg:
+    delete:
+      description: Удаляет запись пользователя из БД по GUID из JWT
+      parameters:
+      - description: JWT токен
+        in: header
+        name: jwt
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Пользователь удалён
+        "400":
+          description: необходим JWT
+          schema:
+            type: string
+        "403":
+          description: неверный JWT
+          schema:
+            type: string
+        "500":
+          description: ошибка сервера
+          schema:
+            type: string
+      summary: Удалить данные пользователя
+      tags:
+      - auth
+  /getguid:
+    get:
+      description: Извлекает GUID из валидного JWT токена (проверяет его наличие в
+        БД)
+      parameters:
+      - description: JWT токен
+        in: header
+        name: jwt
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: необходим JWT
+          schema:
+            type: string
+        "403":
+          description: неверный JWT или пользователь не существует
+          schema:
+            type: string
+        "500":
+          description: ошибка сервера
+          schema:
+            type: string
+      summary: Получить GUID пользователя
+      tags:
+      - auth
+  /gettoken:
+    get:
+      description: Генерирует access и refresh токены для нового пользователя (guid
+        создается для нового пользователя)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: необходим User-Agent
+          schema:
+            type: string
+        "500":
+          description: ошибка сервера
+          schema:
+            type: string
+      summary: Получить пару токенов
+      tags:
+      - auth
+  /refreshtoken:
+    post:
+      consumes:
+      - application/json
+      description: Генерирует новые access и refresh токены для существующего пользователя.
+        Требует валидные JWT и refresh token из заголовков.
+      parameters:
+      - description: Текущий JWT токен
+        in: header
+        name: jwt
+        required: true
+        type: string
+      - description: Текущий refresh token
+        in: header
+        name: refresh_token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Возвращает новую пару токенов
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Необходимы JWT и refresh_token
+          schema:
+            type: string
+        "403":
+          description: Неверный токен/refresh_token или изменён User-Agent
+          schema:
+            type: string
+        "404":
+          description: Пользователь не найден
+          schema:
+            type: string
+        "500":
+          description: Ошибка сервера
+          schema:
+            type: string
+      summary: Обновить пару токенов
+      tags:
+      - auth
+swagger: "2.0"
